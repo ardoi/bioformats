@@ -1064,10 +1064,29 @@ public class ZeissLSMReader extends FormatReader {
         int nStamps = in.readInt();
         for (int i=0; i<nStamps; i++) {
           double stamp = in.readDouble();
-          addSeriesMetaList("TimeStamp", stamp);
+          //addSeriesMetaList("TimeStamp", stamp);
           timestamps.add(new Double(stamp));
         }
       }
+      int save_together = 100;
+      int timestamp_read_next = 0;
+      int stamp_id = 0;
+      while(timestamp_read_next<timestamps.size()){
+          StringBuffer sb = new StringBuffer(String.valueOf(timestamps.get(timestamp_read_next)));
+          timestamp_read_next++;
+          for(int i = 0; i<save_together; i++){
+              if( timestamp_read_next == timestamps.size()){
+                  break;
+              }
+              sb.append(", "+String.valueOf(timestamps.get(timestamp_read_next)));
+              timestamp_read_next++;
+          }
+          addSeriesMetaList("TimeStamp"+stamp_id, sb.toString());
+          stamp_id++;
+    //LOGGER.info(sb.toString());
+      }
+      //System.out.println(String.valueOf(timestamp_read_next));
+      //LOGGER.info("READ: "+String.valueOf(timestamp_read_next));
 
       if (eventListOffset != 0) {
         in.seek(eventListOffset + 4);
